@@ -34,7 +34,7 @@
         return this._div;
     }
 
-    $.when($.getJSON('data/finished_files/merged_eitc.geojson')).then(
+    $.when($.getJSON('data/finished_files/merged_eitc_house.geojson')).then(
         function(shapes){
 
             boundaries = L.geoJson(shapes, {

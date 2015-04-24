@@ -16,6 +16,14 @@ python -m SimpleHTTPServer
 
 navigate to http://localhost:8000/
 
+# Web dependencies
+We used the following open source tools:
+
+* [Bootstrap](http://getbootstrap.com/) - Responsive HTML, CSS and Javascript framework
+* [Leaflet](http://leafletjs.com/) - javascript library interactive maps
+* [jQuery Address](https://github.com/asual/jquery-address) - javascript library creating RESTful URLs
+* [GitHub pages](https://pages.github.com/) - free static website hosting
+
 # Data
 
 Our map was built using open data from Chicago and Cook County:
@@ -24,14 +32,6 @@ Our map was built using open data from Chicago and Cook County:
 * [Brookings Tax Year 2012 EITC Interactive](http://www.brookings.edu/research/interactives/eitc)
 * [Characteristics of EITC-Eligible Tax Units in 2012 by State](http://www.brookings.edu/research/interactives/~/media/B3EAE3F03D9946A1A506D00405440513.ashx) - Metropolitan Policy Program at Brookings
 * EITC Table from IRS Compliance Data Warehouse, Tax Year 2012
-
-# dependencies
-We used the following open source tools:
-
-* [Bootstrap](http://getbootstrap.com/) - Responsive HTML, CSS and Javascript framework
-* [Leaflet](http://leafletjs.com/) - javascript library interactive maps
-* [jQuery Address](https://github.com/asual/jquery-address) - javascript library creating RESTful URLs
-* [GitHub pages](https://pages.github.com/) - free static website hosting
 
 ## Team
 
@@ -48,8 +48,8 @@ Report it here: https://github.com/datamade/eitc-map/issues
 * Fork the project.
 * Make your feature addition or bug fix.
 * Commit, do not mess with rakefile, version, or history.
-* Send me a pull request. Bonus points for topic branches.
+* Send a pull request. Bonus points for topic branches.
 
 ## Copyright
 
-Copyright (c) 2014 DataMade and Voices for Illinois Children. Released under the [MIT License](https://github.com/datamade/eitc-map/blob/master/LICENSE).
+Copyright (c) 2015 DataMade and Voices for Illinois Children. Released under the [MIT License](https://github.com/datamade/eitc-map/blob/master/LICENSE).

@@ -7,7 +7,7 @@ SHELL := /bin/bash
 .SUFFIXES:
 
 # Variables specific to this build
-PG_HOST="33.33.33.8"
-PG_USER="postgres"
+PG_HOST="localhost"
+PG_USER="derekeder"
 PG_DB="eitc"
 PG_PORT="5432"
