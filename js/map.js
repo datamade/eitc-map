@@ -1,19 +1,21 @@
 (function(){
     var lastClicked;
-    var boundaries;
+    var house_boundaries;
+    var senate_boundaries;
+    var view_mode = 'house'
     var marker;
     var map = L.map('map', {minZoom: 6})
         .fitBounds([[36.970298, -87.495199],[42.5083380000001,-91.5130789999999]]);
     var googleLayer = new L.Google('ROADMAP', {animate: false});
     map.addLayer(googleLayer);
     map.on('zoomstart', function(e){
-        map.removeLayer(boundaries);
+        map.removeLayer(house_boundaries);
         if (typeof marker !== 'undefined'){
             map.removeLayer(marker);
         }
     })
     google.maps.event.addListener(googleLayer._google, 'idle', function(e){
-        map.addLayer(boundaries);
+        map.addLayer(house_boundaries);
         if (typeof marker !== 'undefined'){
             map.addLayer(marker);
         }
@@ -21,7 +23,7 @@
     google.maps.event.addListenerOnce(googleLayer._google, 'idle', function(e){
         var district = $.address.parameter('district');
         if (district && !address){
-            boundaries.eachLayer(function(layer){
+            house_boundaries.eachLayer(function(layer){
                 if(layer.feature.properties['ILHOUSEDIS'] == district){
                     layer.fire('click');
                 }
@@ -34,13 +36,28 @@
         return this._div;
     }
 
+    // load house boundaries
     $.when($.getJSON('data/finished_files/merged_eitc_house.geojson')).then(
         function(shapes){
+            house_boundaries = L.geoJson(shapes, {
+                style: house_style,
+                onEachFeature: onEachFeatureHouse
+            });
 
-            boundaries = L.geoJson(shapes, {
-                style: style,
-                onEachFeature: onEachFeature
-            }).addTo(map);
+            // load senate boundaries
+            $.when($.getJSON('data/finished_files/merged_eitc_senate.geojson')).then(
+                function(shapes){
+                    senate_boundaries = L.geoJson(shapes, {
+                        style: senate_style,
+                        onEachFeature: onEachFeatureSenate
+                    });
+                }
+            );
+
+            if (view_mode == 'senate')
+              senate_boundaries.addTo(map);
+            else
+              house_boundaries.addTo(map);
 
         }
     );
@@ -54,7 +71,7 @@
             var lng = result.geometry.location.lng();
             marker = L.marker([lat, lng]).addTo(map);
             map.setView([lat, lng], 17);
-            var district = leafletPip.pointInLayer([lng, lat], boundaries);
+            var district = leafletPip.pointInLayer([lng, lat], house_boundaries);
 
             $.address.parameter('address', encodeURI($('#search_address').val()));
             district[0].fire('click');
@@ -66,27 +83,57 @@
         $('#search_address').geocomplete('find', address)
     }
 
-    function style(feature){
+    $('.view-mode').click(function(){
+      var mode = $(this).data('view');
+      console.log(mode);
+      
+      if (mode == 'senate') {
+        map.removeLayer(house_boundaries);
+        senate_boundaries.addTo(map);
+      }
+      else {
+        house_boundaries.addTo(map);
+        map.removeLayer(senate_boundaries);
+      }
+
+      $.address.parameter('view_mode', mode);
+      view_mode = mode;
+      return false;
+    });
+
+    function house_style(feature){
         var style = {
             "color": "white",
             "fillColor": "#0570b0",
             "opacity": 1,
             "weight": 1,
-            "fillOpacity": 0.6,
+            "fillOpacity": 0.5,
         }
         return style;
     }
 
-    function onEachFeature(feature, layer){
+    function senate_style(feature){
+        var style = {
+            "color": "white",
+            "fillColor": "#713589",
+            "opacity": 1,
+            "weight": 1,
+            "fillOpacity": 0.5,
+        }
+        return style;
+    }
+
+    function onEachFeatureHouse(feature, layer){
         layer.on('click', function(e){
             if(typeof lastClicked !== 'undefined'){
-                boundaries.resetStyle(lastClicked);
+                house_boundaries.resetStyle(lastClicked);
             }
             e.target.setStyle({'fillColor':"#90BE44"});
             $('#district-info').html(featureInfo(feature.properties));
             map.fitBounds(e.target.getBounds(), {padding: [50,50]});
             lastClicked = e.target;
-            $.address.parameter('district', feature.properties['ILHOUSEDIS'])
+
+            $.address.parameter('house_district', feature.properties['ILHOUSEDIS'])
         });
 
         layer.on('mouseover', function(e){
@@ -99,8 +146,39 @@
         var labelText = feature.properties['HOUSEREP'] + " (" + feature.properties['PARTY'] + ")<br />Illinois House District " + parseInt(feature.properties['ILHOUSEDIS']);
         layer.bindLabel(labelText);
     }
+
+    function onEachFeatureSenate(feature, layer){
+        layer.on('click', function(e){
+            if(typeof lastClicked !== 'undefined'){
+                house_boundaries.resetStyle(lastClicked);
+            }
+            e.target.setStyle({'fillColor':"#90BE44"});
+            $('#district-info').html(featureInfo(feature.properties));
+            map.fitBounds(e.target.getBounds(), {padding: [50,50]});
+            lastClicked = e.target;
+
+            $.address.parameter('senate_district', feature.properties['ILSENATEDI'])
+        });
+
+        layer.on('mouseover', function(e){
+          layer.setStyle({weight: 5})
+        });
+        layer.on('mouseout', function(e){
+          layer.setStyle({weight: 1})
+        })
+
+        var labelText = feature.properties['SENATOR'] + " (" + feature.properties['PARTY'] + ")<br />Illinois Senate District " + parseInt(feature.properties['ILSENATEDI']);
+        layer.bindLabel(labelText);
+    }
+
     function featureInfo(properties){
-        var district = parseInt(properties['ILHOUSEDIS']);
+        var district = '';
+
+        if (view_mode == 'senate')
+          district = parseInt(properties['ILSENATEDI']);
+        else
+          district = parseInt(properties['ILHOUSEDIS']);
+
         var blob = "<div>\
             <p><a href='index.html'>&laquo; back to State view</a></p>\
             <h3>" + properties['HOUSEREP'] + " (" + properties['PARTY'] + "), Illinois House District " + district + "</h3>\
