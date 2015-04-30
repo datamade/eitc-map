@@ -1,10 +1,5 @@
 # EITC Works data
 
-# Setup
-```bash
-> createdb eitc
-> psql -d eitc -c "CREATE EXTENSION postgis"
-```
 
 Install stuff using pip & [homebrew](http://brew.sh/)
 ```bash
@@ -19,14 +14,15 @@ Mac users: you will also need the rename library
 > brew install rename
 ```
 
-Copy the config.mk.example to config.mk:
+Edit the `config.mk` for your settings
 
-```bash
-> cp config.mk.example config.mk
-```
 
 Configure make in `config.mk` with your DB settings, then:
 
 ```bash
+> make created_db
 > make all
+> mace clean_shapefiles
 ```
+
+This will build the necessary geojson files.
