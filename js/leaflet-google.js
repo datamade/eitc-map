@@ -93,7 +93,15 @@ L.Google = L.Class.extend({
         draggable: false,
         disableDoubleClickZoom: true,
         scrollwheel: false,
-        streetViewControl: false
+        streetViewControl: false,
+        styles: [
+          {
+            stylers: [
+              { saturation: -100 },
+              { lightness: 40 }
+            ]
+          }
+        ]
     });
 
     var _this = this;

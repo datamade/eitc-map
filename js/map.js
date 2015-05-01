@@ -78,23 +78,27 @@
     );
 
     $('#search_address').geocomplete()
-        .bind('geocode:result', function(event, result){
-            if (typeof marker !== 'undefined'){
-                map.removeLayer(marker);
-            }
-            var lat = result.geometry.location.lat();
-            var lng = result.geometry.location.lng();
-            marker = L.marker([lat, lng]).addTo(map);
-            map.setView([lat, lng], 17);
-            var district;
-            if (view_mode == 'senate')
-              district = leafletPip.pointInLayer([lng, lat], senate_boundaries);
-            else
-              district = leafletPip.pointInLayer([lng, lat], house_boundaries);
+      .bind('geocode:result', function(event, result){
+        if (typeof marker !== 'undefined'){
+            map.removeLayer(marker);
+        }
+        var lat = result.geometry.location.lat();
+        var lng = result.geometry.location.lng();
+        marker = L.marker([lat, lng]).addTo(map);
+        map.setView([lat, lng], 17);
+        var district;
+        if (view_mode == 'senate')
+          district = leafletPip.pointInLayer([lng, lat], senate_boundaries);
+        else
+          district = leafletPip.pointInLayer([lng, lat], house_boundaries);
 
-            $.address.parameter('address', encodeURI($('#search_address').val()));
-            district[0].fire('click');
-        });
+        $.address.parameter('address', encodeURI($('#search_address').val()));
+        district[0].fire('click');
+      });
+
+    $("#search").click(function(){
+      $('#search_address').trigger("geocode");
+    });
 
     var address = convertToPlainString($.address.parameter('address'));
     if(address){
@@ -106,8 +110,8 @@
       var self = $(this);
       var mode = self.data('view');
 
-      $('.view-mode').removeClass('active');
-      self.addClass('active');
+      $('.view-mode').removeClass('btn-primary').addClass('btn-default');
+      self.addClass('btn-primary');
       
       if (mode == 'senate') {
         map.removeLayer(house_boundaries);
@@ -117,6 +121,8 @@
         house_boundaries.addTo(map);
         map.removeLayer(senate_boundaries);
       }
+
+      $('#search_address').trigger("geocode");
 
       $.address.parameter('view_mode', mode);
       view_mode = mode;
@@ -199,11 +205,13 @@
         var district = '';
         var doc_link = '';
         var name = '';
+        var mode_name = "House"
 
         if (view_mode == 'senate') {
           district = parseInt(properties['ILSENATEDI']);
           doc_link = "docs/Senate District Fact Sheets v1 " + district + ".pdf";
           name = properties['SENATOR'];
+          mode_name = "Senate"
         }
         else {
           district = parseInt(properties['ILHOUSEDIS']);
@@ -213,7 +221,7 @@
 
         var blob = "<div>\
             <p><a href='index.html'>&laquo; back to State view</a></p>\
-            <h3>" + name + " (" + properties['PARTY'] + "), Illinois House District " + district + "</h3>\
+            <h3>" + name + " (" + properties['PARTY'] + "), Illinois " + mode_name + " District " + district + "</h3>\
             <table class='table'>\
               <tbody>\
                   <tr>\
@@ -249,11 +257,12 @@
               </tbody>\
             </table>\
             <div class='col-lg-6'>\
-              <p><a target='_blank' class='btn btn-primary' href='" + doc_link + "'><i class='icon-download'></i> Download district profile</a></p>\
-              <p><a target='_blank' href='" + doc_link + "'><img class='img-responsive img-rounded' src='images/eitc_factsheet.png' alt='EITC Factsheet' /></a></p>\
+              <h3>District " + district + " profile</h3>\
+              <p><a target='_blank' href='" + doc_link + "'><img class='img-responsive img-thumbnail' src='images/eitc_factsheet.png' alt='EITC Factsheet' /><br /><i class='icon-download'></i> Download district profile</a></p>\
             </div>\
             <div class='col-lg-6'>\
-              <a class='btn btn-primary' target='_blank' href='http://salsa4.salsalabs.com/o/50920/p/dia/action3/common/public/?action_KEY=10927'><i class='icon-bullhorn'></i> Tell your lawmaker EITC Works!</a>\
+              <h3>Tell your lawmaker!</h3>\
+              <p>Help us spread the word about doubling the Illinois Earned Income Tax Credit.</p><p><a class='btn btn-primary' target='_blank' href='http://salsa4.salsalabs.com/o/50920/p/dia/action3/common/public/?action_KEY=10927'><i class='icon-bullhorn'></i> Tell your lawmaker EITC Works!</a></p>\
             </div>\
             <div class='clearfix'></div>\
             </div>";
