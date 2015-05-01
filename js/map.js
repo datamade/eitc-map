@@ -37,7 +37,7 @@
     }
 
     // load house boundaries
-    $.when($.getJSON('data/finished_files/merged_eitc_house.geojson')).then(
+    $.when($.getJSON('data/merged_eitc_house.geojson')).then(
         function(shapes){
             house_boundaries = L.geoJson(shapes, {
                 style: house_style,
@@ -45,7 +45,7 @@
             });
 
             // load senate boundaries
-            $.when($.getJSON('data/finished_files/merged_eitc_senate.geojson')).then(
+            $.when($.getJSON('data/merged_eitc_senate.geojson')).then(
                 function(shapes){
                     senate_boundaries = L.geoJson(shapes, {
                         style: senate_style,
