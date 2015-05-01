@@ -9,22 +9,37 @@
     var googleLayer = new L.Google('ROADMAP', {animate: false});
     map.addLayer(googleLayer);
     map.on('zoomstart', function(e){
-        map.removeLayer(house_boundaries);
+        if (view_mode == 'senate')
+          map.removeLayer(senate_boundaries);
+        else
+          map.removeLayer(house_boundaries);
         if (typeof marker !== 'undefined'){
             map.removeLayer(marker);
         }
     })
     google.maps.event.addListener(googleLayer._google, 'idle', function(e){
-        map.addLayer(house_boundaries);
+        if (view_mode == 'senate')
+          map.addLayer(senate_boundaries);
+        else
+          map.addLayer(house_boundaries);
         if (typeof marker !== 'undefined'){
             map.addLayer(marker);
         }
     })
     google.maps.event.addListenerOnce(googleLayer._google, 'idle', function(e){
-        var district = $.address.parameter('district');
-        if (district && !address){
+        var house_district = $.address.parameter('house_district');
+        var senate_district = $.address.parameter('senate_district');
+        if (house_district && !address){
             house_boundaries.eachLayer(function(layer){
-                if(layer.feature.properties['ILHOUSEDIS'] == district){
+                if(layer.feature.properties['ILHOUSEDIS'] == house_district){
+                    layer.fire('click');
+                }
+            })
+        }
+        if (senate_district && !address){
+            $("#view_mode_senate").click();
+            senate_boundaries.eachLayer(function(layer){
+                if(layer.feature.properties['ILSENATEDI'] == senate_district){
                     layer.fire('click');
                 }
             })
@@ -71,7 +86,11 @@
             var lng = result.geometry.location.lng();
             marker = L.marker([lat, lng]).addTo(map);
             map.setView([lat, lng], 17);
-            var district = leafletPip.pointInLayer([lng, lat], house_boundaries);
+            var district;
+            if (view_mode == 'senate')
+              district = leafletPip.pointInLayer([lng, lat], senate_boundaries);
+            else
+              district = leafletPip.pointInLayer([lng, lat], house_boundaries);
 
             $.address.parameter('address', encodeURI($('#search_address').val()));
             district[0].fire('click');
@@ -84,8 +103,11 @@
     }
 
     $('.view-mode').click(function(){
-      var mode = $(this).data('view');
-      console.log(mode);
+      var self = $(this);
+      var mode = self.data('view');
+
+      $('.view-mode').removeClass('active');
+      self.addClass('active');
       
       if (mode == 'senate') {
         map.removeLayer(house_boundaries);
@@ -133,7 +155,8 @@
             map.fitBounds(e.target.getBounds(), {padding: [50,50]});
             lastClicked = e.target;
 
-            $.address.parameter('house_district', feature.properties['ILHOUSEDIS'])
+            $.address.parameter('senate_district', '');
+            $.address.parameter('house_district', feature.properties['ILHOUSEDIS']);
         });
 
         layer.on('mouseover', function(e){
@@ -150,13 +173,14 @@
     function onEachFeatureSenate(feature, layer){
         layer.on('click', function(e){
             if(typeof lastClicked !== 'undefined'){
-                house_boundaries.resetStyle(lastClicked);
+                senate_boundaries.resetStyle(lastClicked);
             }
             e.target.setStyle({'fillColor':"#90BE44"});
             $('#district-info').html(featureInfo(feature.properties));
             map.fitBounds(e.target.getBounds(), {padding: [50,50]});
             lastClicked = e.target;
 
+            $.address.parameter('house_district', '');
             $.address.parameter('senate_district', feature.properties['ILSENATEDI'])
         });
 
@@ -173,15 +197,23 @@
 
     function featureInfo(properties){
         var district = '';
+        var doc_link = '';
+        var name = '';
 
-        if (view_mode == 'senate')
+        if (view_mode == 'senate') {
           district = parseInt(properties['ILSENATEDI']);
-        else
+          doc_link = "docs/Senate District Fact Sheets v1 " + district + ".pdf";
+          name = properties['SENATOR'];
+        }
+        else {
           district = parseInt(properties['ILHOUSEDIS']);
+          doc_link = "docs/EITC Legislative Fact Sheets FINAL " + district + ".pdf";
+          name = properties['HOUSEREP'];
+        }
 
         var blob = "<div>\
             <p><a href='index.html'>&laquo; back to State view</a></p>\
-            <h3>" + properties['HOUSEREP'] + " (" + properties['PARTY'] + "), Illinois House District " + district + "</h3>\
+            <h3>" + name + " (" + properties['PARTY'] + "), Illinois House District " + district + "</h3>\
             <table class='table'>\
               <tbody>\
                   <tr>\
@@ -217,8 +249,8 @@
               </tbody>\
             </table>\
             <div class='col-lg-6'>\
-              <p><a target='_blank' class='btn btn-primary' href='docs/EITC Legislative Fact Sheets FINAL " + district + ".pdf'><i class='icon-download'></i> Download district profile</a></p>\
-              <p><a target='_blank' href='docs/EITC Legislative Fact Sheets FINAL " + district + ".pdf'><img class='img-responsive img-rounded' src='images/eitc_factsheet.png' alt='EITC Factsheet' /></a></p>\
+              <p><a target='_blank' class='btn btn-primary' href='" + doc_link + "'><i class='icon-download'></i> Download district profile</a></p>\
+              <p><a target='_blank' href='" + doc_link + "'><img class='img-responsive img-rounded' src='images/eitc_factsheet.png' alt='EITC Factsheet' /></a></p>\
             </div>\
             <div class='col-lg-6'>\
               <a class='btn btn-primary' target='_blank' href='http://salsa4.salsalabs.com/o/50920/p/dia/action3/common/public/?action_KEY=10927'><i class='icon-bullhorn'></i> Tell your lawmaker EITC Works!</a>\

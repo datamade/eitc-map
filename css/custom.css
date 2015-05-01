@@ -58,6 +58,23 @@ hr {
     border-color: #0570b0;
 }
 
+.btn-info {
+    background-color: #713589;
+    border-color: #713589;
+    text-transform: none;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.btn-info:hover {
+    background-color: #3e1d4c;
+    border-color: #3e1d4c;
+}
+.btn-info.active {
+    background-color: #3e1d4c;
+    border-color: #3e1d4c;
+}
+
 .info.leaflet-control {
     font-family:'Montserrat',sans-serif;
     background-color: #fff;
