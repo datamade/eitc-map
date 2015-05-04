@@ -262,7 +262,7 @@
             </div>\
             <div class='col-lg-6'>\
               <h3>Tell your lawmaker!</h3>\
-              <p>Help us spread the word about doubling the Illinois Earned Income Tax Credit.</p><p><a class='btn btn-primary' target='_blank' href='http://salsa4.salsalabs.com/o/50920/p/dia/action3/common/public/?action_KEY=10927'><i class='icon-bullhorn'></i> Tell your lawmaker EITC Works!</a></p>\
+              <p>Help us spread the word about doubling the Illinois Earned Income Tax Credit.<br /><br /></p><p><a class='btn btn-primary' target='_blank' href='http://salsa4.salsalabs.com/o/50920/p/dia/action3/common/public/?action_KEY=10927'><i class='icon-bullhorn'></i> Tell your lawmaker EITC Works!</a></p>\
             </div>\
             <div class='clearfix'></div>\
             </div>";
