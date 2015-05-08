@@ -192,6 +192,9 @@
 
         layer.on('mouseover', function(e){
           layer.setStyle({weight: 5})
+          if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+          }
         });
         layer.on('mouseout', function(e){
           layer.setStyle({weight: 1})
