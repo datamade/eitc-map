@@ -58,6 +58,12 @@ hr {
     border-color: #0570b0;
 }
 
+.btn-default {
+    text-transform: none;
+    font-size: 15px;
+    font-weight: normal;
+}
+
 .info.leaflet-control {
     font-family:'Montserrat',sans-serif;
     background-color: #fff;
@@ -69,6 +75,8 @@ hr {
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
+
+.footer-brand { margin-bottom: 10px;}
 
 
 table {
