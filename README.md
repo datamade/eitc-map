@@ -8,7 +8,7 @@ This map allows Illinois residents to explore their legislative district and see
 
 ``` bash
 git clone git@github.com:datamade/eitc-map.git
-cd large-lots
+cd eitc-map
 
 # to run locally
 python -m SimpleHTTPServer
